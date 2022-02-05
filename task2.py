@@ -40,16 +40,17 @@ def deferred_acceptance(matching_table, students, schools):
 
 
 def get_adjusted_matching_table(matching_table, students, schools):
-    adjusted_table = []
+    adjusted_table = {}
     for student in students:
         row = []
         for school in matching_table[student]:
             capacity = schools[school]
             for i in range(0, capacity):
-                row.append(school + str(i))
-        adjusted_table.append(row)
-    for school, capacity in schools.items():
-        adjusted_table.append(matching_table[school])
+                new_school_name = school + str(i)
+                row.append(new_school_name)
+                adjusted_table[new_school_name] = matching_table[school]
+        adjusted_table[student] = row
+
     return adjusted_table
 
 
