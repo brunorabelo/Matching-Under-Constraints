@@ -1,9 +1,3 @@
-prefer = [[7, 5, 6, 4], [5, 4, 6, 7],
-          [4, 5, 6, 7], [4, 5, 6, 7],
-          [0, 1, 2, 3], [0, 1, 2, 3],
-          [0, 1, 2, 3], [0, 1, 2, 3]]
-
-
 def next_unmatched_student(students, matched_students):
     for student in students:
         if student not in matched_students:
@@ -45,7 +39,7 @@ def deferred_acceptance(matching_table, students, schools):
     return matched_students
 
 
-def get_ajusted_matching_table(matching_table, students, schools):
+def get_adjusted_matching_table(matching_table, students, schools):
     ajusted_table = []
     for student in students:
         row = []
@@ -72,7 +66,7 @@ def task2():
         's1': 2,
         's2': 2
     }
-    ajusted = get_ajusted_matching_table(matching_table, students, schools)
+    ajusted = get_adjusted_matching_table(matching_table, students, schools)
     result1 = deferred_acceptance(ajusted, students, schools)
 
     # Instance 2
