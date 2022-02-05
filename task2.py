@@ -40,15 +40,17 @@ def deferred_acceptance(matching_table, students, schools):
 
 
 def get_adjusted_matching_table(matching_table, students, schools):
-    ajusted_table = []
+    adjusted_table = []
     for student in students:
         row = []
         for school in matching_table[student]:
-            row += [school] * schools[school]
-        ajusted_table.append(row)
+            capacity = schools[school]
+            for i in range(0, capacity):
+                row.append(school + str(i))
+        adjusted_table.append(row)
     for school, capacity in schools.items():
-        ajusted_table.append(matching_table[school])
-    return ajusted_table
+        adjusted_table.append(matching_table[school])
+    return adjusted_table
 
 
 def task2():
@@ -66,8 +68,8 @@ def task2():
         's1': 2,
         's2': 2
     }
-    ajusted = get_adjusted_matching_table(matching_table, students, schools)
-    result1 = deferred_acceptance(ajusted, students, schools)
+    adjusted = get_adjusted_matching_table(matching_table, students, schools)
+    result1 = deferred_acceptance(adjusted, students, schools)
 
     # Instance 2
 
