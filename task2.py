@@ -8,17 +8,6 @@ class DeferredAcceptanceAlgo:
         self.students = students
         self.matching_table = self.adjusted_matching_table(matching_table)
 
-    def adjusted_matching_table(self, matching_table):
-        adjusted_table = {}
-        for student in self.students:
-            row = []
-            for school in matching_table[student]:
-                row += school.sub_schools
-            adjusted_table[student] = row
-        for school in self.schools:
-            adjusted_table[school] = matching_table[school]
-        return adjusted_table
-
     def execute(self):
         while True:
             student = self.next_unmatched_student()
@@ -32,6 +21,17 @@ class DeferredAcceptanceAlgo:
                 self.remove_match(school)
             self.add_matching(school, student)
         return self.matching_state.get_students_match()
+
+    def adjusted_matching_table(self, matching_table):
+        adjusted_table = {}
+        for student in self.students:
+            row = []
+            for school in matching_table[student]:
+                row += school.sub_schools
+            adjusted_table[student] = row
+        for school in self.schools:
+            adjusted_table[school] = matching_table[school]
+        return adjusted_table
 
     def remove_match(self, school):
         self.matching_state.remove_match(school=school)
@@ -57,23 +57,36 @@ class DeferredAcceptanceAlgo:
     def next_school_for_student(self, target_student):
         preferred_schools = self.matching_table[target_student]
         target_student_group = target_student.group
+        next_school = -1
         for school in preferred_schools:
+            current_matched_student = self.school_match(school)
+            preferred_student = current_matched_student and self.preferred_student_by_school(school, target_student,
+                                                                                             current_matched_student)
+
+            # check justified envy
+            if current_matched_student and preferred_student != target_student:
+                continue
+
+            # capacity constraint
+            current_total_quantity_school = school.get_quantity_current_students(self.matching_state)
+            if not current_matched_student and current_total_quantity_school == school.get_max_capacity():
+                continue
+
+            # group capacity constraint
             max_quantity_group_school = school.get_max_quantity_group(target_student_group)
             current_quantity_group_school = school.get_quantity_current_students(self.matching_state,
                                                                                  target_student_group)
 
-            current_matched_student = self.school_match(school)
             current_matched_student_group = current_matched_student and current_matched_student.group
-
-            if current_quantity_group_school == max_quantity_group_school and current_matched_student_group and \
-                    current_matched_student_group != target_student_group:
+            reached_limit = max_quantity_group_school == current_quantity_group_school
+            # case 1: not matched and reached limit students
+            if not current_matched_student and reached_limit:
+                continue
+            # case 2: matched with different group and reached limit students
+            if current_matched_student and target_student_group != current_matched_student_group and reached_limit:
                 continue
 
-            if not current_matched_student:
-                return school
-            if target_student == self.preferred_student_by_school(school, target_student, current_matched_student):
-                return school
-
+            return school
         return -1
 
     def preferred_student_by_school(self, school, s1, s2):

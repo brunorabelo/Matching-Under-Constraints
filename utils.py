@@ -101,8 +101,11 @@ class SubSchool(School):
     def get_max_quantity_group(self, group):
         return self.school_parent.get_max_quantity_group(group)
 
-    def get_quantity_current_students(self, matching_state, group):
+    def get_quantity_current_students(self, matching_state, group=None):
         return self.school_parent.get_quantity_current_students(matching_state, group)
+
+    def get_max_capacity(self):
+        return self.school_parent.capacity
 
     def __eq__(self, other):
         if type(other) != type(self):
@@ -116,6 +119,11 @@ class SubSchool(School):
         return self.school_name
 
 
+
+
+##########
+##################################
+######
 def get_adjusted_matching_table(matching_table, schools, students):
     adjusted_table = {}
     for student in students:
@@ -126,24 +134,6 @@ def get_adjusted_matching_table(matching_table, schools, students):
     for school in schools:
         adjusted_table[school] = matching_table[school]
     return adjusted_table
-
-
-def fill_matching_table_schools(matching_table, schools, students):
-    w = np.random.standard_normal(len(students))
-    for school in schools:
-        noises = np.random.standard_normal(len(students))
-        wn = w + noises
-        student_idx_wn_list = sorted(enumerate(wn), reverse=True, key=lambda x: x[1])
-        school_preference_row = []
-        for st_idx, wn_st in student_idx_wn_list:
-            school_preference_row.append(students[st_idx])
-        matching_table[school] = school_preference_row
-
-
-def fill_matching_table_students(matching_table, p1, p2, students):
-    student_preferences = random.choices([p1, p2], k=len(students))
-    for idx, st in enumerate(students):
-        matching_table[st] = student_preferences[idx]
 
 
 def plot(matching_table, result):
