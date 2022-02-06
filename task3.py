@@ -189,8 +189,6 @@ def get_adjusted_matching_table(matching_table, schools, students):
         row = []
         for school in matching_table[student]:
             row += school.sub_schools
-            # for sub in school.sub_schools:
-            #     adjusted_table[sub] = matching_table[school]
         adjusted_table[student] = row
     for school in schools:
         adjusted_table[school] = matching_table[school]
@@ -221,61 +219,4 @@ def task3():
     result1 = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
 
 
-# Instance 2
-
 task3()
-
-# def next_unmatched_student(students, matched_students):
-#     for student in students:
-#         if student not in matched_students:
-#             return student
-#     return -1
-#
-#
-# def next_school_for_student(matching_table, schools, students, matched_schools, target_student):
-#     preferred_schools = matching_table[target_student]
-#     target_student_group = students[target_student]
-#     for school in preferred_schools:
-#         max_quantity_group_school = schools[school][target_student_group]
-#         current_quantity_group_school = 0
-#         school_names = schools[school]['school_names']
-#         for school_name in school_names:
-#             if school_name in matched_schools and students[matched_schools[school_name]] == target_student:
-#                 current_quantity_group_school += 1
-#
-#         current_matched_student = matched_schools[school]
-#         current_matched_student_group = students[current_matched_student]
-#         if current_quantity_group_school == max_quantity_group_school and current_matched_student_group != target_student_group:
-#             continue
-#         if school not in matched_schools:
-#             return school
-#         current_matched_student = matched_schools[school]
-#         preferred_students = matching_table[school]
-#
-#         for student in preferred_students:
-#             if student == target_student:
-#                 return school
-#             if student == current_matched_student:
-#                 break
-#     return -1
-#
-#
-# def deferred_acceptance(matching_table, students, schools):
-#     matched_students = {}
-#     matched_schools = {}
-#     while True:
-#         student = next_unmatched_student(students, matched_students)
-#         if student == -1:
-#             break
-#         school = next_school_for_student(matching_table, schools, students, matched_schools, student)
-#         if school == -1:
-#             break
-#         if school in matched_schools:
-#             student_unmatched = matched_schools[school]
-#             del matched_schools[school]
-#             del matched_students[student_unmatched]
-#         matched_schools[school] = student
-#         matched_students[student] = school
-#     return matched_students
-#
-#
