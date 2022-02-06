@@ -72,20 +72,6 @@ class DeferredAcceptanceAlgo:
             if not current_matched_student and current_total_quantity_school == school.get_max_capacity():
                 continue
 
-            # group capacity constraint
-            max_quantity_group_school = school.get_max_quantity_group(target_student_group)
-            current_quantity_group_school = school.get_quantity_current_students(self.matching_state,
-                                                                                 target_student_group)
-
-            current_matched_student_group = current_matched_student and current_matched_student.group
-            reached_limit = max_quantity_group_school == current_quantity_group_school
-            # case 1: not matched and reached limit students
-            if not current_matched_student and reached_limit:
-                continue
-            # case 2: matched with different group and reached limit students
-            if current_matched_student and target_student_group != current_matched_student_group and reached_limit:
-                continue
-
             return school
         return -1
 
