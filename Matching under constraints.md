@@ -7,65 +7,7 @@
 
 **Task 2:**
 
-​	The idea to solve the problem is to use the Gale Shapely algorithm with an adapted set of lists of preferences. For this, we duplicate the preference of each school $s$ by $q_s$ in each students preference lists. Similarly we also duplicate the lists of preferences of each school  $s$ by $q_s$. The algorithm has the same complexity of Gale Shapely, as these operations are doable in time $n$. So in the end we still have a $n²$. 
-​	The code implementation in python goes as follows.
-
-```python
-def next_unmatched_student(students, matched_students):
-    for student in students:
-        if student not in matched_students:
-            return student
-    return -1
-
-def next_school_for_student(matching_table, schools, matched_schools, target_student):
-    preferred_schools = matching_table[target_student]
-    for school in preferred_schools:
-        if school not in matched_schools:
-            return school
-        current_matched_student = matched_schools[school]
-        preferred_students = matching_table[school]
-        for student in preferred_students:
-            if student == target_student:
-                return school
-            if student == current_matched_student:
-                break
-    return -1
-
-def deferred_acceptance(matching_table, students, schools):
-    matched_students = {}
-    matched_schools = {}
-    while True:
-        student = next_unmatched_student(students, matched_students)
-        if student == -1:
-            break
-        school = next_school_for_student(matching_table, schools, matched_schools, student)
-        if school == -1:
-            break
-        if school in matched_schools:
-            student_unmatched = matched_schools[school]
-            del matched_schools[school]
-            del matched_students[student_unmatched]
-        matched_schools[school] = student
-        matched_students[student] = school
-    return matched_students
-
-def get_adjusted_matching_table(matching_table, students, schools):
-    adjusted_table = {}
-    for student in students:
-        row = []
-        for school in matching_table[student]:
-            capacity = schools[school]
-            for i in range(0, capacity):
-                new_school_name = school + str(i)
-                row.append(new_school_name)
-                adjusted_table[new_school_name] = matching_table[school]
-        adjusted_table[student] = row
-
-    return adjusted_table
-```
-
-​	The function `get_adjusted_matching_table` is receiving a dictionary `matching_table` with all the preferences for all the students and all the schools. We are using a dictionary because we will often search a school based on a student (and vise versa) and as it's a hash map, it can do so in $O(1)$. The function also receives the list `students` (which is  the set $I=\{i_1, i_2, ...\}$) and the dictionary `schools` with the set $S = \{s_1, s_2, ...\}$ as keys and all the respective capacities as values. This function will adapt the problem to the deferred acceptance standard problem, so we are just replicating the schools by their capacity. We do so by adding an extra index to each school. For example, if $s_1$ has capacity 2, it duplicates as $s_{10}$ and $s_{11}$. So we get $S' = \{s_{10},...,s_{q_{s_1}-1}, s_{20}, ...\}$. This function has a time of execution of $O(|I|\sum_{s \in S} s \cdot q_s|)$. 
-​	The function `deferred_acceptance` is the Gale Shapely algorithm. It utilizes `next_unmatched_student` for searching for students that haven't been matched with $O(n)$ and `next_school_for_student` for searching 
+​	The idea to solve the problem is to use the Gale Shapely algorithm with an adapted set of lists of preferences. For this, we duplicate the preference of each school $s$ by $q_s$ in each students preference lists. Similarly we also duplicate the lists of preferences of each school  $s$ by $q_s$. The algorithm has the same complexity of Gale Shapely, as these operations are doable in time $n$. So in the end we still have a $n²$ 
 
 **Task 3:**
 
