@@ -1,3 +1,8 @@
+import random
+import numpy as np
+from collections import defaultdict
+
+
 class DefferedAcceptanceAlgo:
     def __init__(self, matching_table, schools, students):
         self.matching_state = MatchingState()
@@ -12,7 +17,8 @@ class DefferedAcceptanceAlgo:
                 break
             school = self.next_school_for_student(student)
             if school == -1:
-                break
+                self.add_matching_none(student)
+                continue
             if self.school_is_matched(school):
                 self.remove_match(school)
             self.add_matching(school, student)
@@ -73,6 +79,9 @@ class DefferedAcceptanceAlgo:
     def add_matching(self, school, student):
         self.matching_state.add_match(school, student)
 
+    def add_matching_none(self, student):
+        self.matching_state.add_match_none(student)
+
 
 class MatchingState:
     def __init__(self):
@@ -96,13 +105,16 @@ class MatchingState:
         return self._matched_schools.get(school)
 
     def school_is_matched(self, school):
-        return school in self._matched_schools
+        return school in self._matched_schools.keys()
 
     def student_is_matched(self, student):
-        return student in self._matched_students
+        return student in self._matched_students.keys()
 
     def get_students_match(self):
         return self._matched_students
+
+    def add_match_none(self, student):
+        self._matched_students[student] = None
 
 
 class School:
@@ -111,6 +123,7 @@ class School:
         self.sub_schools = []
         self.quota_group = quota_group
         self.capacity = capacity
+        self.school_parent = self
 
         self.create_sub_schools()
 
@@ -195,6 +208,58 @@ def get_adjusted_matching_table(matching_table, schools, students):
     return adjusted_table
 
 
+def fill_matching_table_schools(matching_table, schools, students):
+    w = np.random.standard_normal(len(students))
+    for school in schools:
+        noises = np.random.standard_normal(len(students))
+        wn = w + noises
+        student_idx_wn_list = sorted(enumerate(wn), reverse=True, key=lambda x: x[1])
+        school_preference_row = []
+        for st_idx, wn_st in student_idx_wn_list:
+            school_preference_row.append(students[st_idx])
+        matching_table[school] = school_preference_row
+
+
+def fill_matching_table_students(matching_table, p1, p2, students):
+    student_preferences = random.choices([p1, p2], k=len(students))
+    for idx, st in enumerate(students):
+        matching_table[st] = student_preferences[idx]
+
+
+def plot(matching_table, result):
+    res = defaultdict(lambda: defaultdict(int))
+    for st, school in result.items():
+        res[st.group]['total'] += 1
+        if school and school.school_parent == matching_table[st][0]:
+            res[st.group]['first'] += 1
+    return res
+
+def instance2(n):
+    s1 = School('s1', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
+    s2 = School('s2', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
+    schools = [s1, s2]
+    students = []
+
+    m = (9 * n) // 10
+    for i in range(0, m):
+        students.append(Student(f'i{i}', "A"))
+    for i in range(m, n):
+        students.append(Student(f'i{i}', "B"))
+
+    matching_table = {}
+    p1 = [s1, s2]
+    p2 = [s2, s1]
+    fill_matching_table_students(matching_table, p1, p2, students)
+
+    fill_matching_table_schools(matching_table, schools, students)
+
+    adjusted = get_adjusted_matching_table(matching_table, schools, students)
+
+    result = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
+    res = plot(matching_table, result)
+    return result
+
+
 def task3():
     # Instance 1
     s1 = School('s1', {"A": 2, "B": 2}, 2)
@@ -216,7 +281,9 @@ def task3():
 
     adjusted = get_adjusted_matching_table(matching_table, schools, students)
 
-    result1 = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
+    # result1 = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
+
+    # Instance 2
+    instance2(6)
 
 
-task3()

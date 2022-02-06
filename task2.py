@@ -71,8 +71,9 @@ def task2():
     }
     adjusted = get_adjusted_matching_table(matching_table, students, schools)
     result1 = deferred_acceptance(adjusted, students, schools)
-
+    print(result1)
     # Instance 2
+
 
 
 task2()
