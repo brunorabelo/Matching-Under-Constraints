@@ -1,79 +1,92 @@
-def next_unmatched_student(students, matched_students):
-    for student in students:
-        if student not in matched_students:
-            return student
-    return -1
+from utils import MatchingState, School, SubSchool, Student
 
 
-def next_school_for_student(matching_table, schools, matched_schools, target_student):
-    preferred_schools = matching_table[target_student]
-    for school in preferred_schools:
-        if school not in matched_schools:
-            return school
-        current_matched_student = matched_schools[school]
-        preferred_students = matching_table[school]
-        for student in preferred_students:
-            if student == target_student:
-                return school
-            if student == current_matched_student:
+class DeferredAcceptanceAlgo:
+    def __init__(self, matching_table, schools, students):
+        self.matching_state = MatchingState()
+        self.schools = schools
+        self.students = students
+        self.matching_table = self.adjusted_matching_table(matching_table)
+
+    def adjusted_matching_table(self, matching_table):
+        adjusted_table = {}
+        for student in self.students:
+            row = []
+            for school in matching_table[student]:
+                row += school.sub_schools
+            adjusted_table[student] = row
+        for school in self.schools:
+            adjusted_table[school] = matching_table[school]
+        return adjusted_table
+
+    def execute(self):
+        while True:
+            student = self.next_unmatched_student()
+            if student == -1:
                 break
-    return -1
+            school = self.next_school_for_student(student)
+            if school == -1:
+                self.add_matching_none(student)
+                continue
+            if self.school_is_matched(school):
+                self.remove_match(school)
+            self.add_matching(school, student)
+        return self.matching_state.get_students_match()
 
+    def remove_match(self, school):
+        self.matching_state.remove_match(school=school)
 
-def deferred_acceptance(matching_table, students, schools):
-    matched_students = {}
-    matched_schools = {}
-    while True:
-        student = next_unmatched_student(students, matched_students)
-        if student == -1:
-            break
-        school = next_school_for_student(matching_table, schools, matched_schools, student)
-        if school == -1:
-            break
-        if school in matched_schools:
-            student_unmatched = matched_schools[school]
-            del matched_schools[school]
-            del matched_students[student_unmatched]
-        matched_schools[school] = student
-        matched_students[student] = school
-    return matched_students
+    def next_unmatched_student(self):
+        for student in self.students:
+            if not self.student_is_matched(student):
+                return student
+        return -1
 
+    def school_match(self, school):
+        return self.matching_state.school_match_or_none(school)
 
-def get_adjusted_matching_table(matching_table, students, schools):
-    adjusted_table = {}
-    for student in students:
-        row = []
-        for school in matching_table[student]:
-            capacity = schools[school]
-            for i in range(0, capacity):
-                new_school_name = school + str(i)
-                row.append(new_school_name)
-                adjusted_table[new_school_name] = matching_table[school]
-        adjusted_table[student] = row
+    def student_match(self, student):
+        return self.matching_state.student_match_or_none(student)
 
-    return adjusted_table
+    def school_is_matched(self, school):
+        return self.matching_state.school_is_matched(school)
 
+    def student_is_matched(self, student):
+        return self.matching_state.student_is_matched(student)
 
-def task2():
-    # Instance 1
-    matching_table = {
-        'i1': ['s1', 's2'],
-        'i2': ['s2', 's1'],
-        'i3': ['s1'],
-        'i4': ['s2'],
-        's1': ['i4', 'i3', 'i2', 'i1'],
-        's2': ['i4', 'i3', 'i2', 'i1']
-    }
-    students = ['i1', 'i2', 'i3', 'i4']
-    schools = {
-        's1': 2,
-        's2': 2
-    }
-    adjusted = get_adjusted_matching_table(matching_table, students, schools)
-    result1 = deferred_acceptance(adjusted, students, schools)
-    print(result1)
-    # Instance 2
+    def next_school_for_student(self, target_student):
+        preferred_schools = self.matching_table[target_student]
+        target_student_group = target_student.group
+        for school in preferred_schools:
+            max_quantity_group_school = school.get_max_quantity_group(target_student_group)
+            current_quantity_group_school = school.get_quantity_current_students(self.matching_state,
+                                                                                 target_student_group)
 
+            current_matched_student = self.school_match(school)
+            current_matched_student_group = current_matched_student and current_matched_student.group
 
+            if current_quantity_group_school == max_quantity_group_school and current_matched_student_group and \
+                    current_matched_student_group != target_student_group:
+                continue
 
-task2()
+            if not current_matched_student:
+                return school
+            if target_student == self.preferred_student_by_school(school, target_student, current_matched_student):
+                return school
+
+        return -1
+
+    def preferred_student_by_school(self, school, s1, s2):
+        preferred_students = self.matching_table[school.school_parent]
+        for student in preferred_students:
+            if student == s1:
+                return s1
+            if student == s2:
+                return s2
+        return -1
+
+    def add_matching(self, school, student):
+        self.matching_state.add_match(school, student)
+
+    def add_matching_none(self, student):
+        self.matching_state.add_match_none(student)
