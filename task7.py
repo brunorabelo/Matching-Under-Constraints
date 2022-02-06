@@ -60,37 +60,6 @@ class FixedPointAlgorithm:
         return cutoff_students
 
 
-def instance2(n):
-    s1 = School('s1', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
-    s2 = School('s2', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
-    schools = [s1, s2]
-    students = []
-
-    m = (9 * n) // 10
-    for i in range(0, m):
-        students.append(Student(f'i{i}', "A"))
-    for i in range(m, n):
-        students.append(Student(f'i{i}', "B"))
-
-    matching_table = {}
-    p1 = [s1, s2]
-    p2 = [s2, s1]
-    fill_matching_table_students(matching_table, p1, p2, students)
-
-    fill_matching_table_schools(matching_table, schools, students)
-
-    # adjusted = get_adjusted_matching_table(matching_table, schools, students)
-
-    result = FixedPointAlgorithm(matching_table, schools, students, task8).execute()
-    print(result)
-    # res = plot(matching_table, result)
-    # return result
-
-
-def task8(school, demand):
-    return len(demand) <= school.capacity
-
-
 def task7():
     # Instance 1
     s1 = School('s1', {"A": 2, "B": 2}, 2)

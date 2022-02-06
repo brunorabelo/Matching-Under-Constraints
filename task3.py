@@ -1,7 +1,8 @@
+from task2 import DeferredAcceptanceAlgo
 from utils import MatchingState, School, SubSchool, Student
 
 
-class DeferredAcceptanceAlgo:
+class DeferredAcceptanceAlgoCapacityConstraint(DeferredAcceptanceAlgo):
     def __init__(self, matching_table, schools, students):
         self.matching_state = MatchingState()
         self.schools = schools

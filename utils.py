@@ -4,6 +4,10 @@ from collections import defaultdict
 
 
 class MatchingState:
+    """
+    Class to take care of the current matches
+    """
+
     def __init__(self):
         self._matched_schools = {}
         self._matched_students = {}
@@ -38,6 +42,10 @@ class MatchingState:
 
 
 class School:
+    """
+    Class representing a school and its properties
+    """
+
     def __init__(self, school_name, quota_group, capacity):
         self.school_name = school_name
         self.sub_schools = []
@@ -48,15 +56,30 @@ class School:
         self.create_sub_schools()
 
     def create_sub_schools(self):
+        """
+        Ideal to create schools proportionally to their capacity.
+        school s1 with capacity 2 turns to: s10 s11
+        """
         for i in range(0, self.capacity):
             new_school_name = self.school_name + str(i)
             new_sub_school = SubSchool(new_school_name, self)
             self.sub_schools.append(new_sub_school)
 
+    #
     def get_max_quantity_group(self, group):
+        """
+        :param group: the specific group to search for the quota
+        :return: max quantity
+        """
         return self.quota_group[group]
 
     def get_quantity_current_students(self, matching_state, group=None):
+        """
+        get the current quantity of matched students
+        :param matching_state: the matching state to get the matching state
+        :param group: if group is given, returns only the quantity of students of that group
+        :return: the quantity of students matched to this school of a group or in total
+        """
         res = 0
         for sub in self.sub_schools:
             student = matching_state.school_match_or_none(sub)
@@ -77,6 +100,10 @@ class School:
 
 
 class Student:
+    """
+    Class to represent the students
+    """
+
     def __init__(self, name, group):
         self.name = name
         self.group = group
@@ -94,6 +121,8 @@ class Student:
 
 
 class SubSchool(School):
+    """ Class to represent the school availble places"""
+
     def __init__(self, school_name, school_parent):
         self.school_name = school_name
         self.school_parent = school_parent
@@ -120,79 +149,3 @@ class SubSchool(School):
 
 
 
-
-##########
-##################################
-######
-def get_adjusted_matching_table(matching_table, schools, students):
-    adjusted_table = {}
-    for student in students:
-        row = []
-        for school in matching_table[student]:
-            row += school.sub_schools
-        adjusted_table[student] = row
-    for school in schools:
-        adjusted_table[school] = matching_table[school]
-    return adjusted_table
-
-
-def plot(matching_table, result):
-    res = defaultdict(lambda: defaultdict(int))
-    for st, school in result.items():
-        res[st.group]['total'] += 1
-        if school and school.school_parent == matching_table[st][0]:
-            res[st.group]['first'] += 1
-    return res
-
-
-def instance2(n):
-    s1 = School('s1', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
-    s2 = School('s2', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
-    schools = [s1, s2]
-    students = []
-
-    m = (9 * n) // 10
-    for i in range(0, m):
-        students.append(Student(f'i{i}', "A"))
-    for i in range(m, n):
-        students.append(Student(f'i{i}', "B"))
-
-    matching_table = {}
-    p1 = [s1, s2]
-    p2 = [s2, s1]
-    fill_matching_table_students(matching_table, p1, p2, students)
-
-    fill_matching_table_schools(matching_table, schools, students)
-
-    adjusted = get_adjusted_matching_table(matching_table, schools, students)
-
-    result = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
-    res = plot(matching_table, result)
-    return result
-
-
-def task3():
-    # Instance 1
-    s1 = School('s1', {"A": 2, "B": 2}, 2)
-    s2 = School('s2', {"A": 2, "B": 2}, 2)
-    i1 = Student('i1', 'A')
-    i2 = Student('i2', 'A')
-    i3 = Student('i3', 'A')
-    i4 = Student('i4', 'B')
-    schools = [s1, s2]
-    students = [i1, i2, i3, i4]
-    matching_table = {
-        i1: [s1, s2],
-        i2: [s2, s1],
-        i3: [s1],
-        i4: [s2],
-        s1: [i4, i3, i2, i1],
-        s2: [i4, i3, i2, i1]
-    }
-
-    adjusted = get_adjusted_matching_table(matching_table, schools, students)
-
-    # result1 = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
-
-    # Instance 2
-    instance2(6)
