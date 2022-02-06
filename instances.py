@@ -1,8 +1,8 @@
-from random import random
-
+import random
 import numpy as np
 
 from utils import School, Student
+from task3 import DeferredAcceptanceAlgoCapacityConstraint
 
 
 class Instance1:
@@ -32,27 +32,21 @@ class Instance2:
     def __init__(self, n):
         s1 = School('s1', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
         s2 = School('s2', quota_group={"A": 0.9 * n // 4, "B": 0.9 * n // 4}, capacity=n // 4)
-        schools = [s1, s2]
-        students = []
+        self.schools = [s1, s2]
+        self.students = []
 
         m = (9 * n) // 10
         for i in range(0, m):
-            students.append(Student(f'i{i}', "A"))
+            self.students.append(Student(f'i{i}', "A"))
         for i in range(m, n):
-            students.append(Student(f'i{i}', "B"))
+            self.students.append(Student(f'i{i}', "B"))
 
-        matching_table = {}
+        self.matching_table = {}
         p1 = [s1, s2]
         p2 = [s2, s1]
-        Instance2.fill_matching_table_students(matching_table, p1, p2, students)
+        Instance2.fill_matching_table_students(self.matching_table, p1, p2, self.students)
 
-        Instance2.fill_matching_table_schools(matching_table, schools, students)
-        #
-        # adjusted = get_adjusted_matching_table(matching_table, schools, students)
-        #
-        # result = DefferedAcceptanceAlgo(adjusted, schools, students).execute()
-        # res = plot(matching_table, result)
-        # return result
+        Instance2.fill_matching_table_schools(self.matching_table, self.schools, self.students)
 
     def fill_matching_table_schools(matching_table, schools, students):
         w = np.random.standard_normal(len(students))
@@ -71,5 +65,10 @@ class Instance2:
             matching_table[st] = student_preferences[idx]
 
     def execute(self):
-        pass
 
+        return DeferredAcceptanceAlgoCapacityConstraint(self.matching_table, self.schools, self.students).execute()
+        # res = plot(matching_table, result)
+        # return result
+
+
+Instance2(6).execute()
