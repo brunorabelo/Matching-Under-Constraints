@@ -70,7 +70,7 @@ def _make_school_preference_ranking_fair(school_preference, ration_students_grou
             _remove_student_of_group_in_position(school_preference, i, current_group)
 
 
-def get_ration_group_students(students, groups):
+def get_rational_group_students(students, groups):
     n_students = len(students)
     ration_students_group = {group: 0 for group in groups}
     for student in students:
@@ -81,7 +81,7 @@ def get_ration_group_students(students, groups):
 
 
 def get_fair_ranking_matching_table(matching_table, students, groups):
-    ration_students_group = get_ration_group_students(students, groups)
+    ration_students_group = get_rational_group_students(students, groups)
     for school, school_preference in matching_table.items():
         if type(school) == School:
             _make_school_preference_ranking_fair(school_preference, ration_students_group)
