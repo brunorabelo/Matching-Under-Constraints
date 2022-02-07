@@ -1,5 +1,4 @@
-from task2 import DeferredAcceptanceAlgo
-from utils import MatchingState, School, SubSchool, Student
+from algorithms.task2 import DeferredAcceptanceAlgo
 
 
 class DeferredAcceptanceAlgoCapacityConstraint(DeferredAcceptanceAlgo):

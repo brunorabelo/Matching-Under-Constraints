@@ -1,38 +1,52 @@
-import random
-import numpy as np
-from collections import defaultdict
-from task3 import School, SubSchool, Student, MatchingState, fill_matching_table_students, fill_matching_table_schools, \
-    get_adjusted_matching_table
-
-
 class FixedPointAlgorithm:
     def __init__(self, matching_table, schools, students, constraints):
-        self.matching_state = MatchingState()
         self.matching_table = matching_table
         self.schools = schools
         self.students = students
         self.P = [i for i in range(1, len(students) + 2)]
         self.satisfy_constraints = constraints
 
+    def get_student_matching_from_school_matching(self, school_matching):
+        student_matching = {}
+        for school, students in school_matching.items():
+            for student in students:
+                student_matching[student] = school
+        for student in self.students:
+            student_matching.setdefault(student, None)
+        return student_matching
+
+    # def execute(self):
+    #     p = self.find_fixed_point()
+    #     demands = {}
+    #     for school in self.schools:
+    #         demands[school] = self.demand_at_school(school, p)
+    #     students_matching = self.get_student_matching_from_school_matching(demands)
+    #     return students_matching
+    #
+    # def find_fixed_point(self):
+    #     for p in self.P:
+    #         same_p = True
+    #         for school in self.schools:
+    #             if self.mapping_t(school, p) != p:
+    #                 same_p = False
+    #                 break
+    #         if same_p:
+    #             return p
+    #     return -1
+
     def execute(self):
-        p = self.find_fixed_point()
         demands = {}
         for school in self.schools:
+            p = self.find_fixed_point_for_school(school)
             demands[school] = self.demand_at_school(school, p)
-        return demands
+        students_matching = self.get_student_matching_from_school_matching(demands)
+        return students_matching
 
-    def find_fixed_point(self):
-        res = 0
+    def find_fixed_point_for_school(self, school):
         for p in self.P:
-            same_p = True
-            for school in self.schools:
-                if self.mapping_t(school, p) != p:
-                    same_p = False
-                    break
-            if same_p:
+            if self.mapping_t(school, p) == p:
                 return p
-
-        return -1
+        return 1
 
     def demand_at_school(self, s, p):
         cutoff_students = self.get_cutoff_students(s, p)
@@ -58,33 +72,3 @@ class FixedPointAlgorithm:
         preferred_students = self.matching_table[school.school_parent]
         cutoff_students = preferred_students[:len(preferred_students) - p + 1]
         return cutoff_students
-
-
-def task7():
-    # Instance 1
-    s1 = School('s1', {"A": 2, "B": 2}, 2)
-    s2 = School('s2', {"A": 2, "B": 2}, 2)
-    i1 = Student('i1', 'A')
-    i2 = Student('i2', 'A')
-    i3 = Student('i3', 'A')
-    i4 = Student('i4', 'B')
-    schools = [s1, s2]
-    students = [i1, i2, i3, i4]
-    matching_table = {
-        i1: [s1, s2],
-        i2: [s2, s1],
-        i3: [s1],
-        i4: [s2],
-        s1: [i4, i3, i2, i1],
-        s2: [i4, i3, i2, i1]
-    }
-
-    # adjusted = get_adjusted_matching_table(matching_table, schools, students)
-
-    result1 = FixedPointAlgorithm(matching_table, schools, students, task8).execute()
-
-    # Instance 2
-    # instance2(6)
-
-
-instance2(6)

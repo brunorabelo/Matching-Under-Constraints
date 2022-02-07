@@ -20,7 +20,7 @@ class DeferredAcceptanceAlgo:
             if self.school_is_matched(school):
                 self.remove_match(school)
             self.add_matching(school, student)
-        return self.matching_state.get_students_match()
+        return self.matching_state.get_students_matches()
 
     def adjusted_matching_table(self, matching_table):
         adjusted_table = {}
@@ -75,13 +75,18 @@ class DeferredAcceptanceAlgo:
             return school
         return -1
 
-    def preferred_student_by_school(self, school, s1, s2):
+    def preferred_student_by_school(self, school, i1, i2):
         preferred_students = self.matching_table[school.school_parent]
+
+        # idx1 = preferred_students.index(i1)
+        # idx2 = preferred_students.index(i2)
+        # return i1 if idx2 > idx1 else i2
+
         for student in preferred_students:
-            if student == s1:
-                return s1
-            if student == s2:
-                return s2
+            if student == i1:
+                return i1
+            if student == i2:
+                return i2
         return -1
 
     def add_matching(self, school, student):

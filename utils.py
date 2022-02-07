@@ -34,8 +34,11 @@ class MatchingState:
     def student_is_matched(self, student):
         return student in self._matched_students.keys()
 
-    def get_students_match(self):
+    def get_students_matches(self):
         return self._matched_students
+
+    def get_schools_matches(self):
+        return self._matched_schools
 
     def add_match_none(self, student):
         self._matched_students[student] = None
@@ -62,7 +65,7 @@ class School:
         """
         for i in range(0, self.capacity):
             new_school_name = self.school_name + str(i)
-            new_sub_school = SubSchool(new_school_name, self)
+            new_sub_school = SubSchool(new_school_name, self, i)
             self.sub_schools.append(new_sub_school)
 
     #
@@ -117,15 +120,16 @@ class Student:
         return hash(self.name)
 
     def __repr__(self):
-        return self.name
+        return f"{self.name} - group: {self.group}"
 
 
 class SubSchool(School):
     """ Class to represent the school availble places"""
 
-    def __init__(self, school_name, school_parent):
+    def __init__(self, school_name, school_parent, place=0):
         self.school_name = school_name
         self.school_parent = school_parent
+        self.place = place
 
     def get_max_quantity_group(self, group):
         return self.school_parent.get_max_quantity_group(group)
@@ -145,7 +149,4 @@ class SubSchool(School):
         return hash(self.school_name)
 
     def __repr__(self):
-        return self.school_name
-
-
-
+        return f"{self.school_parent.school_name} - place: {self.place}"
