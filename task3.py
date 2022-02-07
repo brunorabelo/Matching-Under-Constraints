@@ -7,4 +7,3 @@ def algorithm(matching_table, schools, students):
 
 
 x_array, group_array = instance3.report(algorithm)
-# plot(x_array, group_array)

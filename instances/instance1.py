@@ -1,7 +1,9 @@
 from utils import School, Student
 
+GROUPS = ['A', 'B']
 
-def _generate_matching_table_schools_and_students():
+
+def generate_matching_table_schools_and_students():
     s1 = School('s1', {"A": 2, "B": 2}, 2)
     s2 = School('s2', {"A": 2, "B": 2}, 2)
     i1 = Student('i1', 'A')
@@ -23,5 +25,5 @@ def _generate_matching_table_schools_and_students():
 
 
 def report(algorithm):
-    matching_table, schools, students = _generate_matching_table_schools_and_students()
+    matching_table, schools, students = generate_matching_table_schools_and_students()
     return algorithm(matching_table, schools, students)
