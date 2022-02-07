@@ -149,4 +149,4 @@ class SubSchool(School):
         return hash(self.school_name)
 
     def __repr__(self):
-        return f"{self.school_parent.school_name} - place: {self.place}"
+        return f"{self.school_parent.school_name} - place: {self.place + 1}"

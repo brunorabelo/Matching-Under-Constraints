@@ -22,6 +22,6 @@ def _generate_matching_table_schools_and_students():
     return matching_table, schools, students
 
 
-def execute(algorithm):
+def report(algorithm):
     matching_table, schools, students = _generate_matching_table_schools_and_students()
-    return algorithm(matching_table, schools, students).execute()
+    return algorithm(matching_table, schools, students)

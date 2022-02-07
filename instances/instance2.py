@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 import numpy as np
-import matplotlib.pyplot as plt
 import random
 from utils import School, Student
 
@@ -52,7 +51,7 @@ def _count_students_first_choice_per_group(matching_table, student_matching):
     res = defaultdict(int)
     # get total students with their first choice met
     for student, school in student_matching.items():
-        if school and matching_table[student][0] == school:
+        if school and matching_table[student][0] == school.school_parent:
             res[student.group] += 1
     return res
 
@@ -61,17 +60,9 @@ def _get_groups(schools):
     return schools.quota_group.keys()
 
 
-def _plot(x_array, group_array):
-    for group, y_array in group_array:
-        plt.plot(x_array, y_array, label=f"Group: {group}")
-
-    plt.legend("sdds")
-    plt.show()
-
-
-def generate_report(algorithm):
+def report(algorithm):
     realizations = 10
-    n_array = [20, 50, 100, 500, 1000]
+    n_array = [4, 12, 20, 50]
     avg_per_group = defaultdict(list)
     for n in n_array:
         count_group = defaultdict(int)
@@ -82,9 +73,9 @@ def generate_report(algorithm):
             count_per_group = _count_students_first_choice_per_group(matching_table,
                                                                      student_matching)
             for group, count in count_per_group.items():
-                count_group[group] += count / realizations
+                count_group[group] += count
         for group in GROUPS:
-            count_avg = count_group.get(group, 0)
+            count_avg = count_group.get(group, 0) / realizations
             avg_per_group[group].append(count_avg)
 
-    _plot(n_array, avg_per_group)
+    return n_array, avg_per_group

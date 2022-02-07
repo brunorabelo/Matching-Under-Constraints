@@ -1,9 +1,10 @@
 from algorithms.task2 import DeferredAcceptanceAlgo
-from instances.instance2 import report
+from instances import instance3
 
 
 def algorithm(matching_table, schools, students):
     return DeferredAcceptanceAlgo(matching_table, schools, students).execute()
 
 
-report(algorithm)
+x_array, group_array = instance3.report(algorithm)
+# plot(x_array, group_array)
