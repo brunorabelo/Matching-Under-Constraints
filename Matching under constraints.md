@@ -189,4 +189,4 @@ For this third and last part we are applying
 
 **Task 10**: *what happens if we try to run the algorithm with the 4/5-rule constraint?*
 
-​	It will just doesn't work. The algorithm doesn't find a fixed point because of the way we altered the set of preferences of $S$.
+​	It will just not work. The algorithm doesn't find a fixed point because of the way we altered the set of preferences of $S$.
